@@ -8,8 +8,8 @@ ej1a <- function(n,d,c) {
 	class0_data <- replicate(d,rnorm(n/2, class0_mean, sd))
 
 	# Asigno la clase correspondiente a cada dato
-	ones  <- rep(0,1500)+1
-	zeros <- rep(0,1500)
+	ones  <- rep(0,n/2)+1
+	zeros <- rep(0,n/2)
 	class1 <- cbind(class1_data, ones)
 	class0 <- cbind(class0_data, zeros)
 	dataset <- rbind(class1,class0)
