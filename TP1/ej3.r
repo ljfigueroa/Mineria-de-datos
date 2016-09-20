@@ -3,49 +3,57 @@ library(class)
 library(rpart)
 source("ej1.r")
 
-getAcurracy <- function(x, mtd, train, test, cl, class_index) {
-	if(mtd == "knn") {
-		pred <- knn(train, test, cl,k=x)
-	}
-	if(mtd == "dt") {
-		model <- rpart(class ~., train, method="class")
-		pred <- predict(model, test, type="class")
-	}
-	return(sum(test[,class_index] == pred))
-}
+knnGetAcurracy <- function(x, dataset, args, test) {
 
-getK <- function(dataset, method, kmax, ntrain, ntest){
 	if(dataset=="ej1a") {
-		train <- ej1a(ntrain,2,0.75)
-		test  <- ej1a(ntest,2,0.75)
+		b <- args[3]
+		c <- args[4]
+		ntrain <- args[1]
+		train <- ej1a(ntrain,d,c)
 		#cl = factor(c(rep(1,ntrain/2),rep(0,ntrain/2)))
-		cl = train[,3]
-		class_index = 3 # VER
+		class_index = d+1 # VER
+		cl = train[,class_index]
 	}
 
-	if(dataset=="ej1b") {
+	if(dataset=="ej1b"){
+		ntrain <- args[1]
 		train <- ej1b(ntrain)
-		test  <- ej1b(ntest)
 		#cl = factor(c(rep(0,ntrain/2),rep(1,ntrain/2)))
 		cl = train[,3]
 		class_index = 3 # número fijo
 	}
 
-	acurracy <- sapply(1:kmax, function(x) {getAcurracy(x,method,train,test,cl,class_index)})
+	pred <- knn(train, test, cl,k=x)
+	return(sum(test[,class_index] == pred))
+}
+
+getK <- function(dataset, kmax, args, test){
+
+	acurracy <- sapply(1:kmax, function(x) {knnGetAcurracy(x,dataset,args,test)})
 	#acurracy <- acurracy / ntest # Porcentaje de aciertos
 	best_k <- which.max(acurracy)
 	return(c(best_k,acurracy[best_k]))
 }
 
-getBestk <- function(dataset, method, ntrain, ntest, iter, max_k) {
+knnGetMedian <- function(dataset, args, iter, max_k) {
 	# Calculate the number of cores
 	no_cores <- detectCores() - 1
 
 	# Initiate cluster
 	cluster <- makeCluster(no_cores,type="FORK")
 
-	v <- parSapply(cluster, 1:iter, function(z){getK(dataset, method, max_k, ntrain, ntest)})
+	if(dataset=="ej1a") {
+		d <- args[3]
+		c <- args[4]
+		ntest <- args[2]
+		test  <- ej1a(ntest,d,c)
+	}
+	if(dataset=="ej1b") {
+		ntest <- args[2]
+		test  <- ej1b(ntest)
+	}
 
+	v <- parSapply(cluster, 1:iter, function(z){getK(dataset, max_k, args, test)})
 	stopCluster(cluster)
 
 	ac <- matrix(v ,iter, 2, byrow=T)
@@ -56,21 +64,28 @@ getBestk <- function(dataset, method, ntrain, ntest, iter, max_k) {
 	return(ac[mean_ac_index[1],])
 }
 
+d <- 2
+c <- 0.75
 ntrain <- 200
 ntest  <- 2000
-
+args <- c(ntrain,ntest,d,c)
 # Cantidad de interaciones impar
-best <- getBestk("ej1a", "knn", ntrain, ntest, 21, 50)
+best <- knnGetMedian("ej1a", args, 21, 50)
 cat(paste0("Datos ej1a - knn: El mejor k es ", best[1]," y su precisión es ",best[2], "\n"))
-best <- getBestk("ej1b", "knn", ntrain, ntest, 21, 50)
+#best <- knnGetMedian("dt", "ej1a", args, 21, 50)
+#cat(paste0("Datos ej1a - DT: su precisión es ",best[2], "\n"))
+args <- c(ntrain,ntest)
+best <- knnGetMedian("ej1b", args, 21, 50)
 cat(paste0("Datos ej1b - knn: El mejor k es ", best[1]," y su precisión es ",best[2], "\n"))
-best <- getBestk("ej1a", "dt", ntrain, ntest, 21, 50)
-cat(paste0("Datos ej1a - DT: El mejor k es ", best[1]," y su precisión es ",best[2], "\n"))
-best <- getBestk("ej1b", "dt", ntrain, ntest, 21, 50)
-cat(paste0("Datos ej1b - DT: El mejor k es ", best[1]," y su precisión es ",best[2], "\n"))
+#best <- knnGetMedian("dt", "ej1b", args, 21, 50)
+#cat(paste0("Datos ej1b - DT: su precisión es ",best[2], "\n"))
 
 
 
+#	if(mtd == "dt") {
+#		model <- rpart(class ~., train, method="class")
+#		pred <- predict(model, test, type="class")
+#	}
 
 
 
@@ -89,4 +104,4 @@ cat(paste0("Datos ej1b - DT: El mejor k es ", best[1]," y su precisión es ",bes
 #dim(acurracy) <- c(ksize,1) # Necesario para apply
 #acurracy <- apply(acurracy, 1, function(x){sum(eja_test[,3] == knn(eja_train, eja_test, cl,x))}) / ntest
 # Cantidad de prediciones correctas
-#acurracy <- apply(acurracy, 1, function(x) {getAcurracy(x,eja_train,eja_test,cl,3)})
+#acurracy <- apply(acurracy, 1, function(x) {knnGetAcurracy(x,eja_train,eja_test,cl,3)})
