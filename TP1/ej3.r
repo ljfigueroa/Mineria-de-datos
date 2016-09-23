@@ -9,6 +9,13 @@ knnGetAcurracy <- function(x, train,test,class_index) {
 	return(sum(test[,class_index] == pred))
 }
 
+dtAcurracy <- function(train,test,class_index) {
+
+	model <- rpart(class ~., train, method="class")
+	pred <- predict(model, test[,-class_index], type="class")
+	return(sum(test[,class_index] == pred))
+
+}
 dtGetAcurracy <- function(dataset, args, test) {
 
 	if(dataset=="ej1a") {
@@ -29,11 +36,12 @@ dtGetAcurracy <- function(dataset, args, test) {
 		class_index = 3 # número fijo
 	}
 
-	model <- rpart(class ~., train, method="class")
-	pred <- predict(model, test[,-class_index], type="class")
+	#model <- rpart(class ~., train, method="class")
+	#pred <- predict(model, test[,-class_index], type="class")
 
 
-	return(sum(test[,class_index] == pred))
+	#return(sum(test[,class_index] == pred))
+	return(dtAcurracy(train,test,class_index))
 }
 
 
@@ -121,58 +129,92 @@ dtGetMedian <- function(dataset, args, iter) {
 	return(ac[mean_ac_index[1],])
 }
 
+knnCrossValidation <- function(train,n_set,kmax) {
+	ntrain <- nrow(train)
+	d <- dim(train)[2]
+	N <- ntrain / n_set
+	class_index <- d
+	#set_list <- split(train, sample(1:n_set, ntrain, replace=T)) #Genero n_set subdatasets
+	indexes <- sample(cut(seq(1,ntrain),breaks=n_set,labels=FALSE))
+	best <- rep(0,n_set*2)
+	dim(best) <- c(n_set,2)
+	for(i in 1:n_set) {
+		#test <- data.frame(set_list[i],  row.names = NULL, check.names = F)
+		#train <- Reduce(function(...) merge(..., all=T),set_list[-i])
+		index <- which(indexes==i,arr.ind=TRUE)
+		totest <- train[index,]
+		totrain <- train[-index,]
+		acurracy <- sapply(1:kmax, function(x) {knnGetAcurracy(x,totrain,totest,class_index)})
+		#acurracy <- acurracy / ntest # Porcentaje de aciertos
+		best_k <- which.max(acurracy)
+		best[i,1] <- best_k
+		best[i,2] <- acurracy[best_k]
+	}
+	#print(best)
+	index <-which.max(best[,2])
+	return(best[index,])
+	#best_k <- best[index,1]
+	#ac <- best[index,2]
+}
+
+dtCrossValidation <- function(train,n_set) {
+	ntrain <- nrow(train)
+	d <- dim(train)[2]
+	N <- ntrain / n_set
+	class_index <- d
+	#set_list <- split(train, sample(1:n_set, ntrain, replace=T)) #Genero n_set subdatasets
+	indexes <- sample(cut(seq(1,ntrain),breaks=n_set,labels=FALSE))
+	best <- rep(0,n_set*2)
+	dim(best) <- c(n_set,2)
+	for(i in 1:n_set) {
+		#test <- data.frame(set_list[i],  row.names = NULL, check.names = F)
+		#train <- Reduce(function(...) merge(..., all=T),set_list[-i])
+		index <- which(indexes==i,arr.ind=TRUE)
+		totest <- train[index,]
+		totrain <- train[-index,]
+		acurracy <- sapply(1:1, function(x) {dtAcurracy(totrain,totest,class_index)})
+		#acurracy <- acurracy / ntest # Porcentaje de aciertos
+		best_k <- which.max(acurracy)
+		best[i,1] <- best_k
+		best[i,2] <- acurracy[best_k]
+	}
+	#print(best)
+	index <-which.max(best[,2])
+	return(best[index,])
+	#best_k <- best[index,1]
+	#ac <- best[index,2]
+}
+
 d <- 2
 c <- 0.75
+k_max <- 20			#Cantidad y número máximo de k a probar
 ntrain <- 200
 ntest  <- 2000
 args <- c(ntrain,ntest,d,c)
 # Cantidad de interaciones impar
-best <- knnGetMedian("ej1a", args, 21, 20)
-cat(paste0("Datos ej1a - knn: El mejor k es ", best[1]," y su precisión es ",best[2], "\n"))
+best <- knnGetMedian("ej1a", args, 21, k_max)
+cat(paste0("Datos ej1a - knn: El mejor k es ", best[1]," y su precisión es ",best[2],"/",ntest," (",best[2]/ntest, ")\n"))
 #args <- c(ntrain,ntest)
-best <- knnGetMedian("ej1b", args, 21, 50)
-cat(paste0("Datos ej1b - knn: El mejor k es ", best[1]," y su precisión es ",best[2], "\n"))
+best <- knnGetMedian("ej1b", args, 21, k_max)
+cat(paste0("Datos ej1b - knn: El mejor k es ", best[1]," y su precisión es ",best[2], "/",ntest," (",best[2]/ntest, ")\n"))
 best <- dtGetMedian("ej1a", args, 21)
-cat(paste0("Datos ej1a - DT: su precisión es ",best[2], "\n"))
+cat(paste0("Datos ej1a - DT: su precisión es ",best[2], "/",ntest," (",best[2]/ntest, ")\n"))
 best <- dtGetMedian("ej1b", args, 21)
-cat(paste0("Datos ej1b - DT: su precisión es ",best[2], "\n"))
+cat(paste0("Datos ej1b - DT: su precisión es ",best[2], "/",ntest," (",best[2]/ntest, ")\n"))
 
 # Cross validation
-n_set <- 5			#Número de subconjuntos
-kmax <- 20			#Cantidad y número máximo de k a probar
-
+nset <- 5			#Número de subconjuntos
+N <- ntrain / nset
 # Dataset ej1a
 train <- ej1a(ntrain,d,c)
-N <- ntrain / n_set
-class_index <- d+1
-set_list <- split(train, sample(1:n_set, ntrain, replace=T)) #Genero n_set subdatasets
-best <- rep(0,n_set)
-for(i in 1:5) {
-	test <- data.frame(set_list[i],  row.names = NULL, check.names = F)
-	train <- Reduce(function(...) merge(..., all=T),set_list[-i])
-	acurracy <- sapply(1:kmax, function(x) {knnGetAcurracy(x,train,test,class_index)})
-	#acurracy <- acurracy / ntest # Porcentaje de aciertos
-	best_k <- which.max(acurracy)
-	best[i] <-best_k
-}
-#print(best)
-best_k <-max(best[1])
-cat(paste0("Datos ej1a - knn - cross-validation: El mejor k es ", best_k, "\n"))
+best <- knnCrossValidation(train,nset,k_max)
+cat(paste0("Datos ej1a - knn - cross-validation: El mejor k es ", best[1], " y su precisión es ",best[2], "/",N," (",best[2]/N, ")\n"))
+best <- dtCrossValidation(train,nset)
+cat(paste0("Datos ej1a - dt - cross-validation: su precisión es ",best[2], "/",N," (",best[2]/N, ")\n"))
 
 # Dataset ej1b
 train <- ej1b(ntrain)
-N <- ntrain / n_set
-class_index <- d+1
-set_list <- split(train, sample(1:n_set, ntrain, replace=T)) #Genero n_set subdatasets
-best <- rep(0,n_set)
-for(i in 1:5) {
-	test <- data.frame(set_list[i],  row.names = NULL, check.names = F)
-	train <- Reduce(function(...) merge(..., all=T),set_list[-i])
-	acurracy <- sapply(1:kmax, function(x) {knnGetAcurracy(x,train,test,class_index)})
-	#acurracy <- acurracy / ntest # Porcentaje de aciertos
-	best_k <- which.max(acurracy)
-	best[i] <-best_k
-}
-#print(best)
-best_k <-max(best[1])
-cat(paste0("Datos ej1b - knn - cross-validation: El mejor k es ", best_k, "\n"))
+best <- knnCrossValidation(train,nset,k_max)
+cat(paste0("Datos ej1b - knn - cross-validation: El mejor k es ", best[1], " y su precisión es ",best[2], "/",N," (",best[2]/N, ")\n"))
+best <- dtCrossValidation(train,nset)
+cat(paste0("Datos ej1b - dt - cross-validation: su precisión es ",best[2], "/",N," (",best[2]/N, ")\n"))
