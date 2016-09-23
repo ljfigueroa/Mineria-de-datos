@@ -19,9 +19,6 @@ ej1a <- function(n,d,c) {
 	return(data.frame(dataset))
 }
 
-# Escribo la tabla csv correspondiente al dataset
-#write.table(dataset, file="dataset1.csv", col.names=FALSE, row.names=F, sep=",")
-
 ro1 <- function(angulo) {
 	return(angulo / (4 * pi))
 }
@@ -81,6 +78,8 @@ ej1b <- function(n) {
 	return(data.frame(dataset))
 }
 
+# Genera dos pdfs como ejemplo, cada uno representa los datasets generados por
+# ej1a y ej1b
 ej1_test <- function() {
 	dfa <- ej1a(3000,2,0.75)
 	dfb <- ej1b(3000)

@@ -38,24 +38,17 @@ dtGetAcurracy <- function(dataset, args, test) {
 		c <- args[4]
 		ntrain <- args[1]
 		train <- ej1a(ntrain,d,c)
-		#cl = factor(c(rep(1,ntrain/2),rep(0,ntrain/2)))
-		class_index = d+1 # VER
+		class_index = d+1
 		cl = train[,class_index]
 	}
 
 	if(dataset=="ej1b"){
 		ntrain <- args[1]
 		train <- ej1b(ntrain)
-		#cl = factor(c(rep(0,ntrain/2),rep(1,ntrain/2)))
 		cl = train[,3]
 		class_index = 3 # número fijo
 	}
 
-	#model <- rpart(class ~., train, method="class")
-	#pred <- predict(model, test[,-class_index], type="class")
-
-
-	#return(sum(test[,class_index] == pred))
 	return(dtAcurracy(train,test,class_index))
 }
 
@@ -72,21 +65,18 @@ getK <- function(dataset, kmax, args, test) {
 		c <- args[4]
 		ntrain <- args[1]
 		train <- ej1a(ntrain,d,c)
-		#cl = factor(c(rep(1,ntrain/2),rep(0,ntrain/2)))
-		class_index = d+1 # VER
+		class_index = d+1
 		cl = train[,class_index]
 	}
 
 	if(dataset=="ej1b"){
 		ntrain <- args[1]
 		train <- ej1b(ntrain)
-		#cl = factor(c(rep(0,ntrain/2),rep(1,ntrain/2)))
 		cl = train[,3]
 		class_index = 3 # número fijo
 	}
 
 	acurracy <- sapply(1:kmax, function(x) {knnGetAcurracy(x,train,test,class_index)})
-	#acurracy <- acurracy / ntest # Porcentaje de aciertos
 	best_k <- which.max(acurracy)
 	return(c(best_k,acurracy[best_k]))
 }
@@ -122,12 +112,11 @@ knnGetMedian <- function(dataset, args, iter, max_k) {
 	# Libero los recursos
 	stopCluster(cluster)
 
-	ac <- matrix(v ,iter, 2, byrow=T)
-	#print(ac)
+	ac <- matrix(v ,iter, 2, byrow=T) # uso una matriz para simplificar el calculo
+					  # de la mediana
 	# Calculo la precisión media
 	mean_ac <- median(ac[,2])
 	mean_ac_index <- which(ac[,2] == mean_ac)
-	#print(mean_ac_index)
 	return(ac[mean_ac_index[1],])
 }
 
@@ -161,71 +150,59 @@ dtGetMedian <- function(dataset, args, iter) {
 	# Libero los recursos
 	stopCluster(cluster)
 
-	ac <- matrix(v ,iter, 2, byrow=T)
-	#print(ac)
+	ac <- matrix(v ,iter, 2, byrow=T) # uso una matriz para simplificar el calculo
+					  # de la mediana
+
 	# Calculo la precisión media
 	mean_ac <- median(ac[,2])
 	mean_ac_index <- which(ac[,2] == mean_ac)
-	#print(mean_ac_index)
 	return(ac[mean_ac_index[1],])
 }
 
 # Devuelve el k y la precisión tras ejecutar cross-validación con n_set particiones.
 knnCrossValidation <- function(train,n_set,kmax) {
-	ntrain <- nrow(train)
-	d <- dim(train)[2]
-	N <- ntrain / n_set
-	class_index <- d
-	#set_list <- split(train, sample(1:n_set, ntrain, replace=T)) #Genero n_set subdatasets
+	ntrain <- nrow(train)		# Cantidad de datos disponibles para particionar
+	N <- ntrain / n_set		# Tamaño de cada sub-dataset
+	class_index <- dim(train)[2]    # Pocisión de la columna de las clases
+	# Indices tomados de forma aleatorea
 	indexes <- sample(cut(seq(1,ntrain),breaks=n_set,labels=FALSE))
+	# best es donde se guardan los resultados de las ejecuciones del for
 	best <- rep(0,n_set*2)
 	dim(best) <- c(n_set,2)
 	for(i in 1:n_set) {
-		#test <- data.frame(set_list[i],  row.names = NULL, check.names = F)
-		#train <- Reduce(function(...) merge(..., all=T),set_list[-i])
 		index <- which(indexes==i,arr.ind=TRUE)
 		totest <- train[index,]
 		totrain <- train[-index,]
 		acurracy <- sapply(1:kmax, function(x) {knnGetAcurracy(x,totrain,totest,class_index)})
-		#acurracy <- acurracy / ntest # Porcentaje de aciertos
 		best_k <- which.max(acurracy)
 		best[i,1] <- best_k
 		best[i,2] <- acurracy[best_k]
 	}
-	#print(best)
-	index <-which.max(best[,2])
-	return(best[index,])
-	#best_k <- best[index,1]
-	#ac <- best[index,2]
+	mean_ac <- median(best[,2])
+	mean_ac_index <- which(best[,2] == mean_ac)
+	return(best[mean_ac_index[1],])
 }
 
 # Devuelve la precisión tras ejecutar cross-validación con n_set particiones.
 dtCrossValidation <- function(train,n_set) {
-	ntrain <- nrow(train)
-	d <- dim(train)[2]
-	N <- ntrain / n_set
-	class_index <- d
-	#set_list <- split(train, sample(1:n_set, ntrain, replace=T)) #Genero n_set subdatasets
+	ntrain <- nrow(train)		# Cantidad de datos disponibles para pa
+	N <- ntrain / n_set		# Tamaño de cada sub-dataset
+	class_index <- dim(train)[2]	# Pocisión de la columna de las clases
 	indexes <- sample(cut(seq(1,ntrain),breaks=n_set,labels=FALSE))
 	best <- rep(0,n_set*2)
 	dim(best) <- c(n_set,2)
 	for(i in 1:n_set) {
-		#test <- data.frame(set_list[i],  row.names = NULL, check.names = F)
-		#train <- Reduce(function(...) merge(..., all=T),set_list[-i])
 		index <- which(indexes==i,arr.ind=TRUE)
 		totest <- train[index,]
 		totrain <- train[-index,]
 		acurracy <- sapply(1:1, function(x) {dtAcurracy(totrain,totest,class_index)})
-		#acurracy <- acurracy / ntest # Porcentaje de aciertos
 		best_k <- which.max(acurracy)
 		best[i,1] <- best_k
 		best[i,2] <- acurracy[best_k]
 	}
-	#print(best)
-	index <-which.max(best[,2])
-	return(best[index,])
-	#best_k <- best[index,1]
-	#ac <- best[index,2]
+	mean_ac <- median(best[,2])
+	mean_ac_index <- which(best[,2] == mean_ac)
+	return(best[mean_ac_index[1],])
 }
 
 d <- 2				# Número de dimenciones del dataset
