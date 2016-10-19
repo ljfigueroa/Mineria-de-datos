@@ -86,7 +86,7 @@ error.rate <- function(dataA, dataB) sum( dataA != dataB ) / length(dataB)
 #---------------------------------------------------------------------------
 svm.est <- function(x.train,y,type="C-svc",kernel="vanilladot",C=1,cross = 4)
 {
-	return ( ksvm(x.train, y, type=type,kernel=kernel,C=C,cross = cross)@cross )
+        return ( ksvm(x.train, y, type=type,kernel=kernel,C=C,cross = cross)@cross )
 }
 
 
@@ -95,15 +95,15 @@ svm.est <- function(x.train,y,type="C-svc",kernel="vanilladot",C=1,cross = 4)
 #---------------------------------------------------------------------------
 imp.rf <- function(x.train,y,equalize.classes=TRUE,tot.trees=500,mtry=0)
 {
-	if(mtry<1) mtry<-floor(sqrt(dim(x.train)[2]))
-	prop.samples<-table(y)
-	if(equalize.classes) prop.samples<-rep(min(prop.samples),length(prop.samples))
+        if(mtry<1) mtry<-floor(sqrt(dim(x.train)[2]))
+        prop.samples<-table(y)
+        if(equalize.classes) prop.samples<-rep(min(prop.samples),length(prop.samples))
 
-	m.rf<-randomForest(x.train,y,ntree=tot.trees,mtry=mtry,sampsize=prop.samples,importance=TRUE)
-	imp.mat<-importance(m.rf)
-	imp.col<-dim(imp.mat)[2]-1
-	rank.list<-sort(imp.mat[,imp.col],decreasing=FALSE,index=T)
-	return(list(feats=rank.list$ix,imp=rank.list$x))
+        m.rf<-randomForest(x.train,y,ntree=tot.trees,mtry=mtry,sampsize=prop.samples,importance=TRUE)
+        imp.mat<-importance(m.rf)
+        imp.col<-dim(imp.mat)[2]-1
+        rank.list<-sort(imp.mat[,imp.col],decreasing=FALSE,index=T)
+        return(list(feats=rank.list$ix,imp=rank.list$x))
 }
 
 
@@ -139,10 +139,11 @@ FORW.lda<-forward.ranking(iris[,-5],iris[,5],method="lda.est")
 
 #hacer una funcion que cree datos, 2 clases (-1 y 1,n puntos de cada una), d dimensiones, de ruido uniforme [-1,1], con la clase al azar
 
-crea.ruido.unif<-function(n=100,d=2){
-x<-runif(2*n*d,min=-1)	#genero los datos
-dim(x)<-c(2*n,d)
-return(cbind(as.data.frame(x),y=factor(rep(c(-1,1),each=n))))	#le agrego la clase
+crea.ruido.unif<-function(n=100,d=2)
+{
+        x<-runif(2*n*d,min=-1)	#genero los datos
+        dim(x)<-c(2*n,d)
+        return(cbind(as.data.frame(x),y=factor(rep(c(-1,1),each=n))))	#le agrego la clase
 }
 
 #datosA
