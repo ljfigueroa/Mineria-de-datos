@@ -66,10 +66,7 @@ Propiedades de DatosB
  - Las variables tres y cuatro tienen un 50% de correlación con la clase.
 
 Cabe notar que el dataset es multivariado, pues existe una correlación
-entre las variables uno <-> dos. ¿¿¿¿ variables 3 y 4 independientes ????
-
-El resultado óptimo de los algoritmos de mayor a menor importancia es
-1 o 2, 3 o 4 y después el resto de las variables en cualquier orden.
+entre las variables uno y dos, mientras que las variables tres y cuatro son independientes.
 
 La ejecución del script [ej2.r][ej2] sobre el dataset genera los
 siguientes resultados:
@@ -82,11 +79,40 @@ siguientes resultados:
 > RFE - SVM:  4 3 6 5 7 8 2 1  
 > RFE - RF:  2 1 4 3 6 7 8 5  
 > Forward - RF:  4 3 7 2 1 6 5 8  
-> Forward - SVM:  4 1 2 3 7 8 6 5  
+> Forward - SVM:  4 3 7 8 1 2 5 6  
 > Forward - LDA: 4 3 7 5 8 6 1 2
 
 
-El algoritmo Backward usando el método de *Random Forest* (porque?)
+El algoritmo Backward usando el método de *Random Forest*.. 
+
+Usando el método SVM se observa algo diferente, como se usa un kernel
+lineal para clasificar, no puede interpretar la relación del XOR entre
+la variables uno y dos (es necesario un kernel no lineal para ello)
+entonces la siguientes variables con mayor importancia son las
+variables independientes tres y cuatro respectivamente.  Ocurre lo
+mismo con el método LDA.
+
+El algoritmo de Kruskal como analiza las variables de forma
+independiente, es claro porque elije las variables tres y cuatro como
+las primeras dos y luego el resto.
+
+El analisis dle algoritmo RFE con SVM es el mismo que el dado para
+Backward con SVM.  El algoritmo RFE con RF es el mejor de dos mundos?
+pues por Random Forest puede entender? clasificar? analizar?  la
+relación multivariable entre uno y dos y luego continua agregando las
+variables independientes tres y cuatro que poseen información.
+
+El algoritmo Forward es incapaz de interpretar/deducir la relación
+entre uno y dos, pues como funciona, toma de a una varible y analiza
+el resto, haciendo que elija la variable uno o dos como primera
+variables solo si de forma independiente aportaran más que la variable
+tres o cuatro pero esto no sucede. Luego siempre las dos primeras
+variables son cuatro y tres.  
+
+Notar que siempre que se elija uno(dos) se elije dos(uno) como la
+siente varible, pues habiendo elegido uno(dos) y luego cosiderando la
+variable dos(uno) se predice por completo la clase.
+
 
 
 Ejercicio 3
@@ -95,7 +121,6 @@ Ejercicio 3
 
 Propiedades del dataset diagonal
 --------------------------------
-
 
 
 
