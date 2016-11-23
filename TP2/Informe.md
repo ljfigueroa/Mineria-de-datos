@@ -72,18 +72,20 @@ La ejecución del script [ej2.r][ej2] sobre el dataset genera los
 siguientes resultados:
 
 > Dataset DatosB  
-> Backward - RF:  1 2 8 7 6 5 4 3  
-> Backward - SVM:  4 3 6 7 8 5 1 2  
-> Backward - LDA:  4 3 7 1 6 8 5 2  
-> Kruskal:  4 3 6 5 2 7 1 8  
-> RFE - SVM:  4 3 6 5 7 8 2 1  
-> RFE - RF:  2 1 4 3 6 7 8 5  
-> Forward - RF:  4 3 7 2 1 6 5 8  
-> Forward - SVM:  4 3 7 8 1 2 5 6  
+> Backward - RF: 1 2 8 7 6 5 4 3  
+> Backward - SVM: 4 3 6 7 8 5 1 2  
+> Backward - LDA: 4 3 7 1 6 8 5 2  
+> Kruskal: 4 3 6 5 2 7 1 8  
+> RFE - SVM: 4 3 6 5 7 8 2 1  
+> RFE - RF: 2 1 4 3 6 7 8 5  
+> Forward - RF: 4 3 7 2 1 6 5 8  
+> Forward - SVM: 4 3 7 8 1 2 5 6  
 > Forward - LDA: 4 3 7 5 8 6 1 2
 
 
-El algoritmo Backward usando el método de *Random Forest*.. 
+El algoritmo Backward usando el método de *Random Forest* encuentra la
+realción entre la variable uno y dos pero no la importancia de tres y
+cuatro.
 
 Usando el método SVM se observa algo diferente, como se usa un kernel
 lineal para clasificar, no puede interpretar la relación del XOR entre
@@ -92,26 +94,27 @@ entonces la siguientes variables con mayor importancia son las
 variables independientes tres y cuatro respectivamente.  Ocurre lo
 mismo con el método LDA.
 
-El algoritmo de Kruskal como analiza las variables de forma
-independiente, es claro porque elije las variables tres y cuatro como
-las primeras dos y luego el resto.
+El algoritmo de Kruskal analiza las variables de forma independiente,
+es claro que elije las variables tres y cuatro como las primeras dos y
+luego el resto dado a que son las únicas dos que son independientes.
 
 El analisis dle algoritmo RFE con SVM es el mismo que el dado para
-Backward con SVM.  El algoritmo RFE con RF es el mejor de dos mundos?
-pues por Random Forest puede entender? clasificar? analizar?  la
-relación multivariable entre uno y dos y luego continua agregando las
-variables independientes tres y cuatro que poseen información.
+Backward con SVM. El algoritmo RFE con RF es el mejor de dos mundos,
+pues utilizando el método de Random Forest puede encontrar la relación
+multivariable entre uno y dos y luego continua agregando las variables
+independientes tres y cuatro que son las restantes variables que
+poseen información.
 
-El algoritmo Forward es incapaz de interpretar/deducir la relación
-entre uno y dos, pues como funciona, toma de a una varible y analiza
-el resto, haciendo que elija la variable uno o dos como primera
-variables solo si de forma independiente aportaran más que la variable
-tres o cuatro pero esto no sucede. Luego siempre las dos primeras
-variables son cuatro y tres.  
+El algoritmo Forward es incapaz de capturar la relación entre uno y
+dos, pues como funciona, toma de a una varible y analiza el resto,
+limitando a que elija la variable uno o dos como primera variables si
+y solo si de forma independiente aportaran más que la variable tres o
+cuatro pero esto no sucede. Luego siempre las dos primeras
+variables son cuatro y tres.
 
-Notar que siempre que se elija uno(dos) se elije dos(uno) como la
-siente varible, pues habiendo elegido uno(dos) y luego cosiderando la
-variable dos(uno) se predice por completo la clase.
+Notar que siempre que se elija la variable uno(dos) se elije dos(uno)
+como la siente varible, pues habiendo elegido uno(dos) y luego
+cosiderando la variable dos(uno) se predice por completo la clase.
 
 
 
