@@ -53,9 +53,8 @@ sus desventajas, variables correlacionadas, no existe en este dataset.
 Los algoritmos Backward y Forward acertaron que la variable de mayor
 importancia es la octava pero se equivocaron en la "clasificación" del
 resto de las variables como se puede ver. Esto se debe a la naturaleza
-de ambos algoritmos que consideran un subconjunto de variables al
-mismo tiempo para encontrar las correlacionadas, pero este dataset no
-es multivariado sino univariado.
+de ambos algoritmos para encontrar las variables correlacionadas, pero
+este dataset no es multivariado sino univariado.
 
 
 Propiedades de DatosB
@@ -109,8 +108,7 @@ dos, pues como funciona, toma de a una variable y analiza el resto,
 limitando a que elija la variable uno o dos como primera variables si
 y solo si de forma independiente aportaran más que la variable tres o
 cuatro pero esto no sucede. Luego siempre las dos primeras
-variables son cuatro y tres.
-
+variables son cuatro y tres.  
 Notar que siempre que se elija la variable uno(dos) se elije dos(uno)
 como la siente variable, pues habiendo elegido uno(dos) y luego
 considerando la variable dos(uno) se predice por completo la clase.
@@ -123,7 +121,7 @@ Ejercicio 3
 La ejecución del script ej3.r sobre el dataset genera los siguientes
 resultados:
 
-> Promedio de aciertos: 0.39 0.48 0.31 0.96 0.6 0.92 0.4 0.42 0.47 
+> Promedio de aciertos: 0.39 0.48 0.31 0.96 0.6 0.92 0.4 0.42 0.47
 
 El resultado es el porcentaje promedio de precisión de cada método. Se
 interpretan de la siguiente forma:
