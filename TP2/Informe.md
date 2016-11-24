@@ -118,7 +118,7 @@ considerando la variable dos(uno) se predice por completo la clase.
 Ejercicio 3
 ===========
 
-La ejecución del script ej3.r sobre el dataset genera los siguientes
+La ejecución del script [ej3.r][ej3] sobre el dataset genera los siguientes
 resultados:
 
 > Promedio de aciertos: 0.39 0.48 0.31 0.96 0.6 0.92 0.4 0.42 0.47
