@@ -21,14 +21,13 @@ Propiedades de DatosA
  - El 20% de los datos tiene la clase del signo de la sexta variable.
  - El 10% de los datos tiene la clase del signo de la cuarta variable.
  - El 20% de los datos tiene la clase del signo de la segunda
-   variable.
+   variable.  
 
 Cabe notar que el dataset es univariado, pues no existe correlación
 alguna entre las variables.
 
 El resultado óptimo de los algoritmos de mayor a menor importancia es
-8 6 4 2 y después el resto de las variables en cualquier orden.
-
+8 6 4 2 y después el resto de las variables en cualquier orden.  
 La ejecución del script [ej2.r][ej2] sobre el dataset genera los
 siguientes resultados:
 
@@ -84,7 +83,7 @@ siguientes resultados:
 
 
 El algoritmo Backward usando el método de *Random Forest* encuentra la
-realción entre la variable uno y dos pero no la importancia de tres y
+relación entre la variable uno y dos pero no la importancia de tres y
 cuatro.
 
 Usando el método SVM se observa algo diferente, como se usa un kernel
@@ -98,7 +97,7 @@ El algoritmo de Kruskal analiza las variables de forma independiente,
 es claro que elije las variables tres y cuatro como las primeras dos y
 luego el resto dado a que son las únicas dos que son independientes.
 
-El analisis dle algoritmo RFE con SVM es el mismo que el dado para
+El análisis del algoritmo RFE con SVM es el mismo que el dado para
 Backward con SVM. El algoritmo RFE con RF es el mejor de dos mundos,
 pues utilizando el método de Random Forest puede encontrar la relación
 multivariable entre uno y dos y luego continua agregando las variables
@@ -106,30 +105,56 @@ independientes tres y cuatro que son las restantes variables que
 poseen información.
 
 El algoritmo Forward es incapaz de capturar la relación entre uno y
-dos, pues como funciona, toma de a una varible y analiza el resto,
+dos, pues como funciona, toma de a una variable y analiza el resto,
 limitando a que elija la variable uno o dos como primera variables si
 y solo si de forma independiente aportaran más que la variable tres o
 cuatro pero esto no sucede. Luego siempre las dos primeras
 variables son cuatro y tres.
 
 Notar que siempre que se elija la variable uno(dos) se elije dos(uno)
-como la siente varible, pues habiendo elegido uno(dos) y luego
-cosiderando la variable dos(uno) se predice por completo la clase.
+como la siente variable, pues habiendo elegido uno(dos) y luego
+considerando la variable dos(uno) se predice por completo la clase.
 
 
 
 Ejercicio 3
 ===========
 
+La ejecución del script ej3.r sobre el dataset genera los siguientes
+resultados:
 
-Propiedades del dataset diagonal
---------------------------------
+> Promedio de aciertos: 0.39 0.48 0.31 0.96 0.6 0.92 0.4 0.42 0.47 
+
+El resultado es el porcentaje promedio de precisión de cada método. Se
+interpretan de la siguiente forma:
 
 
+Backward RF: 0.39  
+Backward SVM: 0.48  
+Backward LDA: 0.31  
+Kruscal: 0.96  
+RFE SVM: 0.6  
+RFE RF: 0.92  
+Forward RF: 0.4  
+Forward SVM: 0.42  
+Forward LDA: 0.47
 
-La ejecución del script ej3.r sobre el dataset genera los siguientes resultados:
+La mejor selección de variables la produjo Kruscal con un 96% de
+precisión promedio seguido de Recursive Feature Elimination utilizando
+el método Random Forest con 92% de precisión.
 
-0.4 0.47 0.42 0.39 0.31 0.48 0.96 0.92 0.6  
+Kruscal produce una selección de variable muy buena debido a que
+analiza las variables de forma independiente para el dataset del
+ejercicio 1-a que posee variables todas sus variables independientes.
+
+Recursive Feature Elimination con Random Forest también se beneficia
+dela independencia de las variables. Mientras que utilizando el método
+SVM se nota un descenso en la capacidad de predicción del algoritmo,
+aunque no tan baja como las de Backward y Forward.
+
+Tanto Backward y Foward son malos algoritmos para la selección de
+variables para este dataset, siendo en ambos casos muy lentos y con
+una precisión muy baja comparada con Kruscal y RFE RF.
 
 
 [ej1]: codigo_practico_2.R

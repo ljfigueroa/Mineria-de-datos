@@ -1,27 +1,33 @@
 #-------------------------------------------------------------------------------------
-# AVISO: este codigo esta adaptado de un paquete mayor.
-# No es optimo y tiene cosas inutiles para nosotros. Es un ejemplo nada mas
+# AVISO: este codigo esta adaptado de un paquete mayor.  No es optimo
+# y tiene cosas inutiles para nosotros. Es un ejemplo nada mas
 #
-#general forward greedy selection function
-# x,y inputs and targets
-# method is an external function that estimates classification error with a given model
-# ... parameters for method
-#-------------------------------------------------------------------------------------
+# general forward greedy selection function
+#     x,y inputs and targets
+#     method is an external function that estimates classification error
+#     with a given model ... parameters for method
+# -------------------------------------------------------------------------------------
 forward.ranking <- function(x,y,method,verbosity=0,... )
 {
 
+	#cantidad de variables
 	max.feat<-dim(x)[2]
 	num.feat<-1
+	#lista con la cantidad de variables
 	list.feat<-1:max.feat
 
 	#initial ranking
-        x.train<-matrix(0,dim(x)[1],1)
+    x.train<-matrix(0,dim(x)[1],1)
 	class.error<-double(max.feat)
 	for(i in 1:max.feat){
+		# armo un vector con los valores de la variable i
 		x.train[,1]<-x[,i]
+		# aplico el método a cada variable
 		class.error[i] <- do.call(method, c(list(x.train, y), list(...)) )
 	}
+	#Guardo primera en la lista la variable mínima en error
 	list.feat[1]<-which.min(class.error)
+	#Guardo en orden creciente las variables que no son la mínima
 	keep.feat<-sort(class.error,decreasing=FALSE,index=T)$ix[-1]
 	x.prev<-x.train[,1]<-x[,list.feat[1]]
 
@@ -30,11 +36,13 @@ forward.ranking <- function(x,y,method,verbosity=0,... )
 	while(num.feat<max.feat){
 		class.error<-double(max.feat-num.feat)
 		for(i in 1:(max.feat-num.feat)){
+			#armo el nuevo conjunto de entrenamiento con la de error minimo mas la variable i
 			x.train<-cbind(x.prev,x[,keep.feat[i]])
 			class.error[i] <- do.call(method, c(list(x.train, y), list(...)) )
 		}
 		if(verbosity>2) cat("\nFeatures:\n",keep.feat,"\nErrors:\n",class.error)
-
+		
+		# elijo la combinación de menor error
 		best.index<-which.min(class.error)
 		list.feat[num.feat+1]<-keep.feat[best.index]
 		if(verbosity>1) cat("\n---------\nStep ",1+num.feat,"\nFeature ",best.index)
@@ -42,7 +50,7 @@ forward.ranking <- function(x,y,method,verbosity=0,... )
 		keep.feat<-keep.feat[-best.index]
 		if(verbosity>2) cat("\nNew search list: ",keep.feat)
 		num.feat<-num.feat+1
-		x.prev<-x[,list.feat[1:num.feat]]
+		x.prev<-as.matrix(x[,list.feat[1:num.feat]])
 	}
 
 
@@ -55,10 +63,81 @@ forward.ranking <- function(x,y,method,verbosity=0,... )
 		cat("\nFeatures: ",search.names,"\n")
 	}
 
-	return( list(ordered.names.list=search.names,ordered.features.list=list.feat,importance=imp) )
+ 	return( list(ordered.names.list=search.names,ordered.features.list=list.feat,importance=imp) )
 
 }
 
+backward.ranking <- function(x,y,method,... )
+{
+	numberFeat <- dim(x)[2]
+	totalFeat <- 1:numberFeat
+
+	# Características a descartar
+	inFeat <- totalFeat
+	# Caracteristicas descartadas
+	outFeat <- c()
+
+	# Variables a ignorar en cada ciclo del for
+	ignoreFeat <- 1
+	# Resultado, orden importancia de las variables
+	sortFeat <- c()
+	while(numberFeat - ignoreFeat > 0){
+		#error
+		classError <- double(numberFeat - ignoreFeat+1)
+		j <- 1
+		for(i in inFeat){
+			#armo el conjunto de entrenamiento con todas las variables menos las ya apagadas y la i
+			trainFeat <- totalFeat[-c(outFeat,i)]
+			xTrain <- as.matrix(x[trainFeat])
+			#aplico el método
+			classError[j] <- do.call(method, c(list(xTrain, y), list(...)) )
+			j <- j+1
+		}
+		#decido cuál fue la variable descartada con la cual el error se minimizó
+		worstFeat <- inFeat[which.min(classError)]
+		#la descarto agregándola a la lista de variables apagadas
+		outFeat <- c(worstFeat,outFeat)
+		#actualizo
+		sortFeat[numberFeat-ignoreFeat+1] <- worstFeat
+		inFeat <- inFeat[-which.min(classError)]
+		ignoreFeat <- ignoreFeat+1
+
+	}
+	sortFeat[1] <- inFeat[1]
+	return (sortFeat)
+
+}
+
+# Kruskal
+kruskal.filter <- function(data,class){
+	numberFeat <- dim(data)[2]
+	classError <- double(numberFeat)
+
+	for (i in 1:numberFeat){
+		x <- data[,i]
+		classError[i] <- (kruskal.test(x,class)$statistic)
+	}
+
+	return (sort(classError,index=T,decreasing=T)$ix)
+}
+
+rfe.ranking <- function(x,y,method,... )
+{
+	numberFeat <- dim(x)[2]
+	totalFeat <- 1:numberFeat
+	sortFeat <- c()
+	train <- x
+	inFeat <- totalFeat
+	for(i in (totalFeat[-numberFeat])){
+		rank.feat <- do.call(method, c(list(train, y), list(...)) )
+		worst.feat <- inFeat[rank.feat$feats[1]]
+		sortFeat[numberFeat-i+1] <- worst.feat
+		inFeat <- inFeat[-rank.feat$feats[1]]
+		train <- train[,-rank.feat$feats[1]]
+	}
+	sortFeat[1] <- inFeat[1]
+	return (sortFeat)
+}
 
 #---------------------------------------------------------------------------
 #random forest error estimation (OOB) for greedy search
@@ -169,7 +248,7 @@ datos[,d+1]<-factor(datos[,d+1])
 datosA<-datos
 
 #datosB
-#generar n=100,d=8
+#generar n=1000,d=8
 d<-8
 n<-1000
 datos<-crea.ruido.unif(n=n,d=d)
