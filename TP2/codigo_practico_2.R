@@ -86,18 +86,17 @@ backward.ranking <- function(x,y,method,... )
 		classError <- double(numberFeat - ignoreFeat+1)
 		j <- 1
 		for(i in inFeat){
-			#armo el conjunto de entrenamiento con todas las variables menos las ya apagadas y la i
+			# Genero el cojunto de entrenamiento sin las variables de outFeat e i.
 			trainFeat <- totalFeat[-c(outFeat,i)]
 			xTrain <- as.matrix(x[trainFeat])
-			#aplico el método
+			# Aplico el método
 			classError[j] <- do.call(method, c(list(xTrain, y), list(...)) )
 			j <- j+1
 		}
-		#decido cuál fue la variable descartada con la cual el error se minimizó
+		# Encuentro la variable que minimizó el error
 		worstFeat <- inFeat[which.min(classError)]
-		#la descarto agregándola a la lista de variables apagadas
+		# La descarto y la agrego a la lista de variables descartadas
 		outFeat <- c(worstFeat,outFeat)
-		#actualizo
 		sortFeat[numberFeat-ignoreFeat+1] <- worstFeat
 		inFeat <- inFeat[-which.min(classError)]
 		ignoreFeat <- ignoreFeat+1
