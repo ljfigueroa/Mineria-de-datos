@@ -1,21 +1,26 @@
 library(MASS)
 library(e1071)
 
+# The crabs data frame has 200 rows and 8 columns, describing 5 morphological
+# measurements on 50 crabs each of two colour forms and both sexes, of the
+# species Leptograpsus variegatus collected at Fremantle, W. Australia.
+data(crabs)
+
 getTable <- function(clustering, attribute,ds_number, position, tableResults) {
   contingency_table = table(clustering, attribute)
   class_match = matchClasses(as.matrix(contingency_table), method = "exact")
   table = contingency_table[, class_match]
-  print(table)
+  #print(table)
   columnNames <- colnames(table)
-  print(columnNames)
+  #print(columnNames)
   if (columnNames[1] == "O" || columnNames[1] == "B") {
     table <- table[,c("B", "O")]
   } else {
     table <- table[,c("F", "M")]
   }
-  print(table)
+  #print(table)
   tableResults[as.numeric(ds_number), position] = as.vector(table)
-  print(tableResults)
+  #print(tableResults)
   return(tableResults)
 }
 
@@ -55,12 +60,6 @@ applyMethods <- function(ds, ds_number,tableResults)
   #x = list[tableResults,tableSex]
   return(tableResults);
 }
-
-
-# The crabs data frame has 200 rows and 8 columns, describing 5 morphological
-# measurements on 50 crabs each of two colour forms and both sexes, of the
-# species Leptograpsus variegatus collected at Fremantle, W. Australia.
-data(crabs)
 
 # Crabs's species
 species = crabs[, 1]

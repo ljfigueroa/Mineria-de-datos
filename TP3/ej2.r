@@ -51,21 +51,16 @@ est = function(ds, numberOfClusters, numberOfScores) {
 
     for (s in 1:numberOfScores) {
         for (k in 1:numberOfClusters) {
-
-            # creo dos indices al azar y hago los clusters
             ind1 = sample(n, 0.9 * n)
             cc1 = kmeans(ds[ind1, ], k, nstart = 10)$cluster
 
             ind2 = sample(n, 0.9 * n)
             cc2 = kmeans(ds[ind2, ], k, nstart = 10)$cluster
 
-            # pongo los clusters de nuevo en longitud n - quedan 0 los puntos fuera del
             v1 = v2 = rep(0, n)
             v1[ind1] = cc1
             v2[ind2] = cc2
 
-            # creo una matriz m con 1 donde los dos puntos estan en el mismo cluster, -1 en
-            # distinto cluster y 0 si alguno no esta, para cada clustering
             a = sqrt(v1 %*% t(v1))
             m1 = a/-a + 2 * (a == round(a))
             m1[is.nan(m1)] = 0
@@ -74,8 +69,6 @@ est = function(ds, numberOfClusters, numberOfScores) {
             m2 = a/-a + 2 * (a == round(a))
             m2[is.nan(m2)] = 0
 
-            # calculo el score, los pares de puntos que estan en la misma situacion en los
-            # dos clustering dividido el total de pares validos.
             validos = sum(v1 * v2 > 0)
             score[k, s] = sum((m1 * m2)[upper.tri(m1)] > 0)/(validos * (validos -
                 1)/2)

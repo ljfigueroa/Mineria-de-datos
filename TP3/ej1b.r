@@ -6,17 +6,17 @@ getTable <- function(clust, attribute,ds_number, position, tableResults) {
   contingency_table = table(clust,attribute)
   class_match = matchClasses(as.matrix(contingency_table),method="exact")
   table = contingency_table[,class_match]
-  print(table)
+  #print(table)
   columnNames <- colnames(table)
-  print(columnNames)
+  #print(columnNames)
   if (columnNames[1] == "2007" || columnNames[1] == "2006") {
     table <- table[,c("2006", "2007")]
   } else {
     table <- table[,c("10", "2")]
   }
-  print(table)
+  #print(table)
   tableResults[as.numeric(ds_number), position] = as.vector(table)
-  print(tableResults)
+  #print(tableResults)
   return(tableResults)
 }
 
@@ -60,9 +60,6 @@ applyMethods <- function(ds,ds_number,tableResults) {
     }
     return(tableResults)
 }
-
-
-# Hago un filtro pues existen algunas columnas que son no numericas y no puedo aplicar scale ni prcomp
 
 filter <- c(T,(apply(lampone[,2:142],2,max)>0),T,T)
 # Original dataset

@@ -3,6 +3,7 @@ library(e1071)
 source("ej2.r")
 load("lampone.Rdata")
 data(crabs)
+data(iris)
 
 ## Gaussianas
 gauss_size<-100

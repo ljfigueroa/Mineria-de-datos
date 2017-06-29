@@ -1,13 +1,17 @@
 Minería de datos  - Trabajo Práctico 3 (2016)
 =============================================
 
+Alumnos: Agretti, José Francisco - Figueroa, Lauro Jesús
+========================================================
+
 Implementaciones:
-----------------
+-----------------
 
 * [**ej1a.r**][ej1a] Código de ejercicio 1.a.
 * [**ej1b.r**][ej1b] Código de ejercicio 1.b.
-* [**ej2.r**][ej2] Implementaciones de los métodos
-GAP Statistic y Estabilidad.
+* [**ej2.r**][ej2] Implementaciones de los métodos GAP Statistic y Estabilidad.
+* [**ej3_gap.r**][ej3_gap] Código para generar el output.
+* [**ej3_est.r**][ej3_est] Código para generar las imágenes.
 
 Ejercicio 1a
 ============
@@ -64,21 +68,16 @@ Método aplicado - Atributo - Cluster clasificado
 
 
 
-Podemos observar que en los datasets donde se aplicó PCA se puede visualizar mejor
-las clases.
+Podemos observar que en los datasets donde se aplicó PCA se puede visualizar mejor las clases.
 
 
 ### Análisis de Kmeans
 
-Se puede ver que en el Dataset seis encontró una buena clusterización, de los datos segun la especie. Para ver el resultado de la ejecución del script ver [aquí][ej1a_run]. (HACER LINK T)
+Se puede ver que en el Dataset seis encontró una buena clusterización de los datos según la especie.
 
 ### Análisis de Hclust
 
-Notamos que el algoritmo no pudo encontrar la representación real de los atributos descriptas en CRABS.
-
-#### Nota:
-Estos analisis realizados los concluimos asi porque una buena clusterización estaria representada si en cluster estaria compuesto mayoritariamente por un atributos y el otro con los datos restantes, por lo que este contendria la mayor parte del atributo "opuesto". Por ejemplo si en un cluster agrupo la mayor parte del sexo masculino y el otro el femenino, seria una buena clusterización.
-
+Notamos que el algoritmo no pudo encontrar la representación real de los atributos descriptos en Crabs.
 
 Ejercicio 1b
 ============
@@ -122,6 +121,17 @@ Método aplicado - Atributo - Cluster clasificado
 | 4 | 9  | 18 | 10 | 12 | 26 | 1 | 21 | 1 | 26 | 1 | 21 | 1 | 23 | 4  | 19 | 3 |
 | 5 | 9  | 18 | 7  | 15 | 26 | 1 | 21 | 1 | 26 | 1 | 21 | 1 | 26 | 1  | 19 | 3 |
 
+### Análisis de Kmeans
+
+Se puede ver que K-Means sobre el atributo *year of measurements*, logra en todos los dataset excepto en el ds5 una excelente clusterización. Mientras que sobre el atributo *blueberry* no logra el mismo nivel de precisión, es más, no obtiene ninguna clusterización representativa del atributo.
+
+### Análisis de Hclust
+
+En ambos atributos no logra ningún resultado significativo.
+
+## Nota sobre el ej1:
+Estos análisis realizados los concluimos así porque una buena clusterización estaría representada si un cluster estaría compuesto mayoritariamente por un atributo y el otro cluster con los datos restantes, por lo que este contendría la mayor parte del atributo "opuesto". Por ejemplo si en un cluster agrupo la mayor parte del sexo masculino y el otro el femenino, seria una buena clusterización.
+
 
 Ejercicio 3
 ===========
@@ -134,38 +144,55 @@ Tras ejecutar el script ej3_gap, obtuvimos el siguiente output:
 >[1] "Lampone - Original: 1 PCA: 4 Scale-PCA: 3"
 
 - Para el caso de las cuatro gausianas, se puede ver que es indistinto al proceso de trasformar los datos, pues el resultado es siempre cuatro.
-- En Iris se observa que a medida que se transforman los datos aplicando escalado y PCA la presición de GAP aumenta, pues sabemos que dataset tiene tres clases.
+- En Iris se observa que a medida que se transforman los datos aplicando escalado y PCA la precisión de GAP aumenta, pues sabemos que el dataset tiene tres clases.
 - En el caso de Crabs, se puede observar que aplicar mas transformaciones sobre los datos no mejora la clasificación porque ambos métodos dan el mismo resultado.
-- Para lampone se observa que (obviando el original) a medida que se aumenta la cantidad de transformaciones sobre los datos, se reduce el número de clusters.
+- Para Lampone se observa que (obviando el original) a medida que se aumenta la cantidad de transformaciones sobre los datos, se reduce el número de clusters.
 
-Observamos que a lo largo de las pruebas se obteniene mejores resultados al aplicar GAP sobre datos transformados con escalado y PCA (Scale-PCA).
+Observamos que a lo largo de las pruebas se obtiene mejores resultados al aplicar GAP sobre datos transformados con escalado y PCA (Scale-PCA).
 
+### Estabilidad
 
-![Caption for the picture.](CRABS_2.jpeg)
-![Caption for the picture.](CRABS_3.jpeg)
-![Caption for the picture.](CRABS_4.jpeg)
-![Caption for the picture.](CRABS_5.jpeg)
-![Caption for the picture.](CRABS_6.jpeg)
-![Caption for the picture.](CRABS_7.jpeg)
-![Caption for the picture.](GAUSS_2.jpeg)
-![Caption for the picture.](GAUSS_3.jpeg)
-![Caption for the picture.](GAUSS_4.jpeg)
-![Caption for the picture.](GAUSS_5.jpeg)
-![Caption for the picture.](GAUSS_6.jpeg)
-![Caption for the picture.](GAUSS_7.jpeg)
-![Caption for the picture.](IRIS_2.jpeg)
-![Caption for the picture.](IRIS_3.jpeg)
-![Caption for the picture.](IRIS_4.jpeg)
-![Caption for the picture.](IRIS_5.jpeg)
-![Caption for the picture.](IRIS_6.jpeg)
-![Caption for the picture.](IRIS_7.jpeg)
-![Caption for the picture.](LAMPONE_2.jpeg)
-![Caption for the picture.](LAMPONE_3.jpeg)
-![Caption for the picture.](LAMPONE_4.jpeg)
-![Caption for the picture.](LAMPONE_5.jpeg)
-![Caption for the picture.](LAMPONE_6.jpeg)
-![Caption for the picture.](LAMPONE_7.jpeg)
+Aplicamos el algoritmo de estabilidad para encontrar el número natural de clusters de los datasets dados.
+Las gráficas a continuación las usamos para ver la consentración bajo los histogramas y así poder concluir el número natural de clusters sugeridos por el algoritmo.
+
+#### Crabs
+![Crabs_DS_2.](CRABS_2.jpeg)
+![Crabs_DS_3.](CRABS_3.jpeg)
+![Crabs_DS_4.](CRABS_4.jpeg)
+![Crabs_DS_5.](CRABS_5.jpeg)
+![Crabs_DS_6.](CRABS_6.jpeg)
+![Crabs_DS_7.](CRABS_7.jpeg)
+- La concentración bajo los histogramas del dataset Crabs sugiere que hay dos cluesters.
+
+#### Gauss
+![Gauss_DS_2.](GAUSS_2.jpeg)
+![Gauss_DS_3.](GAUSS_3.jpeg)
+![Gauss_DS_4.](GAUSS_4.jpeg)
+![Gauss_DS_5.](GAUSS_5.jpeg)
+![Gauss_DS_6.](GAUSS_6.jpeg)
+![Gauss_DS_7.](GAUSS_7.jpeg)
+- En en el dataset Gauss se puede ver que la mayor concentración bajo el histograma es con K=4.
+
+#### Iris
+![Iris_DS_2.](IRIS_2.jpeg)
+![Iris_DS_3.](IRIS_3.jpeg)
+![Iris_DS_4.](IRIS_4.jpeg)
+![Iris_DS_5.](IRIS_5.jpeg)
+![Iris_DS_6.](IRIS_6.jpeg)
+![Iris_DS_7.](IRIS_7.jpeg)
+- En Iris a diferencia del resultado anterior, la cantidad de clusters sugeridos es dos o tres. Siguiendo nuestro razonamiento, diríamos que dos es mas estable que tres, aunque sabemos que tres es el numero correcto de clusters en el dataset importado.
+
+#### Lampone
+![Lampone_DS_2.](LAMPONE_2.jpeg)
+![Lampone_DS_3.](LAMPONE_3.jpeg)
+![Lampone_DS_4.](LAMPONE_4.jpeg)
+![Lampone_DS_5.](LAMPONE_5.jpeg)
+![Lampone_DS_6.](LAMPONE_6.jpeg)
+![Lampone_DS_7.](LAMPONE_7.jpeg)
+- Por último, vemos en Lampone que con K=3 se encuentra la mayor concentración bajo el histograma, seguida por la concentración con K=2.
 
 [ej1a]: ej1a.r
 [ej1b]: ej1b.r
 [ej2]: ej2.r
+[ej3_gap]: ej3_gap.r
+[ej3_est]: ej3_est.r
